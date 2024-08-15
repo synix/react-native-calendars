@@ -163,7 +163,7 @@ export default class Agenda extends Component<AgendaProps, State> {
   }
 
   calendarOffset() {
-    return 96 - this.viewHeight / 2;
+    return 56 - this.viewHeight / 2;
   }
 
   initialScrollPadPosition = () => {

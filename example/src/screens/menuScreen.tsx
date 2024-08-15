@@ -67,6 +67,7 @@ const MenuScreen = (props: Props) => {
         {renderEntry(testIDs.menu.HORIZONTAL_LIST, 'Horizontal Calendar List', 'CalendarListScreen', {horizontalView: true})}
         {renderEntry(testIDs.menu.HORIZONTAL_LIST, 'NEW Calendar List', 'NewCalendarListScreen')}
         {renderEntry(testIDs.menu.AGENDA, 'Agenda', 'AgendaScreen')}
+        {renderEntry(testIDs.menu.SAFE_AREA_AGENDA, 'SafeAreaAgenda', 'SafeAreaAgendaScreen')}
         {renderEntry(testIDs.menu.EXPANDABLE_CALENDAR, 'Expandable Calendar', 'ExpandableCalendarScreen')}
         {renderEntry(testIDs.menu.TIMELINE_CALENDAR, 'Timeline Calendar', 'TimelineCalendarScreen')}
         {renderEntry(testIDs.menu.WEEK_CALENDAR, 'Week Calendar', 'ExpandableCalendarScreen', {weekView: true})}
