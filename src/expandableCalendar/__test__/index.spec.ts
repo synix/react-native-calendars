@@ -6,7 +6,7 @@ import {getMonthTitle} from '../../testUtils';
 import {UpdateSources} from '../commons';
 import times from 'lodash/times';
 import {NUMBER_OF_PAGES} from '../WeekCalendar';
-import {CalendarContextProviderProps} from 'react-native-calendars';
+import {CalendarContextProviderProps} from '../Context/Provider';
 
 const XDate = require('xdate');
 

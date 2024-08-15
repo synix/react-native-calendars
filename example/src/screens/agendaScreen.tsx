@@ -14,7 +14,7 @@ export default class AgendaScreen extends Component<State> {
 
   render() {
     return (
-      <View style={{ flex: 1, alignItems: 'center', alignContent: 'center' }}>
+      <View style={{flex: 1, alignItems: 'center', alignContent: 'center'}}>
         <Text style={{fontSize: 20, color: 'red'}}>Agenda Screen</Text>
         <Agenda
           style={{width: '100%'}}

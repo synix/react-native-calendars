@@ -1,6 +1,6 @@
 {
-  "name": "react-native-calendars",
-  "version": "1.22.0",
+  "name": "@synix/react-native-calendars",
+  "version": "0.0.1",
   "main": "src/index.ts",
   "types": "src/index.d.ts",
   "description": "React Native Calendar Components",
@@ -16,6 +16,7 @@
     "unit": "jest",
     "lint": "eslint src/ example/src --ext .tsx,.ts,.js",
     "release": "node ./scripts/release.js",
+    "pkg-release": "node ./scripts/pkg-release.js",
     "start": "react-native start",
     "ios": "react-native run-ios",
     "android": "react-native run-android",
@@ -25,10 +26,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wix/react-native-calendars"
+    "url": "git+https://github.com/synix/react-native-calendars.git"
   },
   "publishConfig": {
-    "synix:registry": "https://npm.pkg.github.com"
+    "registry": "https://npm.pkg.github.com",
+    "access": "public"
   },
   "author": "Wix.com",
   "license": "MIT",

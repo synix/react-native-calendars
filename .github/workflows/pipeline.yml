@@ -1,6 +1,15 @@
 name: 'release'
 on:
   workflow_dispatch:
+    inputs:
+      is-snapshot:
+        type: boolean
+        description: Publish snapshot version
+        default: false
+      is-hotfix:
+        type: boolean
+        description: Publish hotfix version
+        default: false
 env:
   NPM_CONFIG_GITHUB_REGISTRY: https://npm.pkg.github.com
 jobs:
@@ -15,6 +24,12 @@ jobs:
           registry-url: ${{env.NPM_CONFIG_GITHUB_REGISTRY}}
           scope: '@synix'
 
+      - name: Set env
+        run: |
+          echo "CI_PIPELINE_ID=${{ github.run_id }}${{ github.run_attempt }}" >> $GITHUB_ENV
+          echo "IS_SNAPSHOT=${{ github.event.inputs.is-snapshot }}" >> $GITHUB_ENV
+          echo "IS_HOTFIX=${{ github.event.inputs.is-hotfix }}" >> $GITHUB_ENV
+
       - run: npm install
 
       - name: Run test
@@ -25,12 +40,15 @@ jobs:
 
       - name: Authenticate with Github NPM
         run: |
-          cd packages/client-ts
           echo "@synix:registry=$NPM_CONFIG_GITHUB_REGISTRY" >> .npmrc
-          echo "//npm.pkg.github.com/:_authToken=$${{ secrets.GITHUB_TOKEN }}" >> .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> .npmrc
+          echo "always-auth=true" >> .npmrc
+
+      - name: Prepare for publish
+        run: npm run pkg-release
 
       - name: Publish to Github Packages
-        run: npm run release
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 

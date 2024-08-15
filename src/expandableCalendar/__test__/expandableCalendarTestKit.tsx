@@ -1,11 +1,7 @@
 import React from 'react';
-import {
-  CalendarContextProviderProps,
-  CalendarProvider,
-  ExpandableCalendar,
-  ExpandableCalendarProps
-} from 'react-native-calendars';
 import {toMarkingFormat} from '../../interface';
+import ExpandableCalendar, {ExpandableCalendarProps} from '../index';
+import CalendarProvider, {CalendarContextProviderProps} from '../Context/Provider';
 
 const XDate = require('xdate');
 
