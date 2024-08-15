@@ -28,7 +28,7 @@
     "url": "git+https://github.com/wix/react-native-calendars"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
+    "synix:registry": "https://npm.pkg.github.com"
   },
   "author": "Wix.com",
   "license": "MIT",

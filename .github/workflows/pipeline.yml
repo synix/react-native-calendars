@@ -1,0 +1,42 @@
+name: 'release'
+on:
+  workflow_dispatch:
+env:
+  NPM_CONFIG_GITHUB_REGISTRY: https://npm.pkg.github.com
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          registry-url: ${{env.NPM_CONFIG_GITHUB_REGISTRY}}
+          scope: '@synix'
+
+      - run: npm install
+
+      - name: Run test
+        run: npm run test
+
+      - name: Build package
+        run: npm run build:ts
+
+      - name: Authenticate with Github NPM
+        run: |
+          cd packages/client-ts
+          echo "@synix:registry=$NPM_CONFIG_GITHUB_REGISTRY" >> .npmrc
+          echo "//npm.pkg.github.com/:_authToken=$${{ secrets.GITHUB_TOKEN }}" >> .npmrc
+
+      - name: Publish to Github Packages
+        run: npm run release
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Archive npm failure logs
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: npm-logs
+          path: ~/.npm/_logs    
