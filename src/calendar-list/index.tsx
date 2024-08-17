@@ -18,6 +18,7 @@ import CalendarHeader from '../calendar/header/index';
 import isEqual from 'lodash/isEqual';
 
 const CALENDAR_WIDTH = constants.screenWidth;
+// CALENDAR_HEIGHT是Calendar默认的minHeight
 const CALENDAR_HEIGHT = 360;
 const PAST_SCROLL_RANGE = 50;
 const FUTURE_SCROLL_RANGE = 50;
@@ -163,22 +164,33 @@ const CalendarList = (props: CalendarListProps & ContextProp, ref: any) => {
 
   const scrollToDay = (date: XDate | string, offset: number, animated: boolean) => {
     const scrollTo = parseDate(date);
+    // 计算滚动到date，相比initialDate的月份差值
     const diffMonths = Math.round(initialDate?.current?.clone().setDate(1).diffMonths(scrollTo?.clone().setDate(1)));
-    let scrollAmount = calendarSize * pastScrollRange + diffMonths * calendarSize + (offset || 0);
+    // calendarSize * pastScrollRange, 滚动到initialDate需要多少月
+    // diffMonths * calendarSize, 从initialDate滚动到date需要多少月
+    // 1. scrollAmount此时只能滚动到整月对齐
+    let scrollAmount = calendarSize * pastScrollRange + diffMonths * calendarSize 
 
+    // 2. 加上要滚动的周数
+    // 此时按代码意图滚动是滚动到周对齐，但是因为每个月还有monthname + weekname组成的CalendarHeader，所以想要周对齐，需要加上header的高度
     if (!horizontal) {
       let week = 0;
       const days = page(scrollTo, firstDay);
       for (let i = 0; i < days.length; i++) {
         week = Math.floor(i / 7);
         if (sameDate(days[i], scrollTo)) {
+          // ☠️ 周的行高写死为46? 这是坑吧...
           scrollAmount += 46 * week;
           break;
         }
       }
     }
 
+    // 3. offset其实有两部分，一部分是header的高度，一部分是如果当前date不是在view顶部对齐，而是垂直居中对齐所需要的额外offset
+    scrollAmount += (offset || 0);
+
     if (scrollAmount !== 0) {
+      // offset为0表示上滚动在设定的最早日期上
       // @ts-expect-error
       list?.current?.scrollToOffset({offset: scrollAmount, animated});
     }

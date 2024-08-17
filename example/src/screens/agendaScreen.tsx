@@ -15,7 +15,7 @@ export default class AgendaScreen extends Component<State> {
   render() {
     return (
       <View style={{flex: 1, alignItems: 'center', alignContent: 'center'}}>
-        <Text style={{fontSize: 20, color: 'red'}}>Agenda Screen</Text>
+        <Text style={{fontSize: 20, color: 'red', height: 30}}>Agenda Screen</Text>
         <Agenda
           style={{width: '100%'}}
           testID={testIDs.agenda.CONTAINER}
@@ -26,6 +26,7 @@ export default class AgendaScreen extends Component<State> {
           renderEmptyDate={this.renderEmptyDate}
           rowHasChanged={this.rowHasChanged}
           showClosingKnob={true}
+          showWeekNumbers={true}
         />
       </View>
     );

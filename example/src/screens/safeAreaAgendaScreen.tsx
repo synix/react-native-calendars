@@ -28,14 +28,14 @@ export default class SafeAreaAgendaScreen extends Component<State> {
             return <View/>;
           }
           }
-          renderHeader={(date?: XDate) => {
-            return (
-              <View style={styles.headerContainer}>
-                <Text style={styles.headerMonth}>{date?.toString('MMMM')}</Text>
-                <Text style={styles.headerYear}>{date?.toString('yyyy')}</Text>
-              </View>
-            );
-          }}
+          // renderHeader={(date?: XDate) => {
+          //   return (
+          //     <View style={styles.headerContainer}>
+          //       <Text style={styles.headerMonth}>{date?.toString('MMMM')}</Text>
+          //       <Text style={styles.headerYear}>{date?.toString('yyyy')}</Text>
+          //     </View>
+          //   );
+          // }}
           renderKnob={() => {
             return (
               <View style={styles.knob} />
@@ -43,26 +43,24 @@ export default class SafeAreaAgendaScreen extends Component<State> {
           }}
           hideKnob={false}
           showClosingKnob={true}
-          hideExtraDays={true}
-          hideDayNames={true}
+          // hideExtraDays={true}
+          // hideDayNames={true}
           calendarStyle={{backgroundColor: '#D3D2FF'}}
-          calendarHeight={300}
-          animateScroll={true}
+          // calendarHeight={300}
           onCalendarToggled={toggled => {
             console.log('⚡️ onCalendarToggled: ', toggled);
           }}
           theme={{
             calendarBackground: '#D3D2FF',
-            textDayHeaderFontFamily: 'Manrope_500Medium',
-            textDayHeaderFontWeight: '500',
-            textDayHeaderFontSize: 12,
+            // textDayHeaderFontFamily: 'Manrope_500Medium',
+            // textDayHeaderFontWeight: '500',
+            // textDayHeaderFontSize: 12,
             textSectionTitleColor: '#6C727F',
-            textDayFontSize: 14,
-            textDayFontWeight: '700',
+            // textDayFontSize: 14,
+            // textDayFontWeight: '700',
             textDayStyle: {
               color: '#121826'
             },
-            indicatorColor: 'yellow'
           }}
         />
       </SafeAreaView>
@@ -76,7 +74,6 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#D3D2FF'
   },
-
   titleContainer: {
     height: 80,
     padding: 20,
@@ -103,11 +100,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   knob: {
-    width: 38,
-    height: 4,
-    marginTop: 10,
-    borderWidth: 2,
-    borderColor: '#A8A5FF',
-    borderRadius: 2
+    // width: 38,
+    // height: 4,
+    // marginTop: 10,
+    // borderWidth: 2,
+    // borderColor: '#A8A5FF',
+    // borderRadius: 2
   }
 });

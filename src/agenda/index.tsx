@@ -26,8 +26,11 @@ import WeekDaysNames from '../commons/WeekDaysNames';
 import CalendarList, {CalendarListProps, CalendarListImperativeMethods} from '../calendar-list';
 import ReservationList, {ReservationListProps}  from './reservation-list';
 
-
+// 这个104相当于收缩时的高度，那么这个高度为什么是104?
+// 收缩是从上到下weekdaynames，一行weekday，knob view
+// weekdaynames的高度39.6, 一行weekday的高度32(上下padding各预留为4?), knob view的高度24
 const HEADER_HEIGHT = 104;
+// 底部knob的高度, 也就是renderKnob()渲染的元素的高度
 const KNOB_HEIGHT = 24;
 
 export type AgendaProps = CalendarListProps & ReservationListProps & {
@@ -54,7 +57,7 @@ export type AgendaProps = CalendarListProps & ReservationListProps & {
 }
 
 type State = {
-  scrollY: Animated.Value;
+  scrollY: Animated.Value; // scrollY是一个动画值，用于控制y方向的滚动位置
   calendarIsReady: boolean;
   calendarScrollable: boolean;
   firstReservationLoad: boolean;
@@ -94,7 +97,10 @@ export default class Agenda extends Component<AgendaProps, State> {
   private headerState: string;
   private currentMonth: XDate;
   private knobTracker: VelocityTracker;
+  // 用于判断组件是否已挂载, 在componentDidMount中会设置为true, 在componentWillUnmount中会设置为false
   private _isMounted: boolean | undefined;
+
+  // 以下refs是用于获取组件的引用
   private scrollPad: React.RefObject<any> = React.createRef();
   private calendar: React.RefObject<CalendarListImperativeMethods> = React.createRef();
   private knob: React.RefObject<View> = React.createRef();
@@ -106,6 +112,8 @@ export default class Agenda extends Component<AgendaProps, State> {
     this.style = styleConstructor(props.theme);
 
     const windowSize = Dimensions.get('window');
+    // 这里只是将view width/height初始化为window size
+    // 在onLayout中会将view width/height更新为顶层View的size
     this.viewHeight = windowSize.height;
     this.viewWidth = windowSize.width;
 
@@ -121,10 +129,15 @@ export default class Agenda extends Component<AgendaProps, State> {
       topDay: this.getSelectedDate(props.selected)
     };
 
+    // 当前月份是通过state.selectedDay来确定的
     this.currentMonth = this.state.selectedDay.clone();
 
     this.knobTracker = new VelocityTracker();
-    this.state.scrollY.addListener(({value}) => this.knobTracker.add(value));
+    this.state.scrollY.addListener(({value}) => {
+      console.log('[Agenda] scrollY: ', value);
+      // 完全展开时，scrollY为0，完全收缩时，scrollY为最大值(view height - 104)
+      this.knobTracker.add(value);
+    });
   }
 
   componentDidMount() {
@@ -134,6 +147,7 @@ export default class Agenda extends Component<AgendaProps, State> {
 
   componentWillUnmount() {
     this._isMounted = false;
+    // 对应constructor中的state.scrollY.addListener()
     this.state.scrollY.removeAllListeners();
   }
 
@@ -163,7 +177,13 @@ export default class Agenda extends Component<AgendaProps, State> {
   }
 
   calendarOffset() {
-    return 56 - this.viewHeight / 2;
+    // 为什么是96?
+    // 默认情况下81.5是calendar每个月顶部CalendarHeader的高度(monthname + weekname)
+    // 但是为了使week行上半部的day文字垂直居中，还得加上day高度(默认为32)的一半
+    // 所以这里的准确来说是81.5 + 32 / 2 = 97.5，96只能说是近似值
+
+    // this.viewHeight / 2 表示滚到居中对齐，而不是顶部对齐
+    return 96 - this.viewHeight / 2;
   }
 
   initialScrollPadPosition = () => {
@@ -268,15 +288,18 @@ export default class Agenda extends Component<AgendaProps, State> {
   onLayout = (event: LayoutChangeEvent) => {
     this.viewHeight = event.nativeEvent.layout.height;
     this.viewWidth = event.nativeEvent.layout.width;
+    console.log('[Agenda] actual viewSize: ', this.viewWidth, this.viewHeight);
     this.forceUpdate();
   };
 
   onTouchStart = () => {
+    console.log('[AgendaTouch] onTouchStart');
     this.headerState = 'touched';
     this.knob?.current?.setNativeProps({style: {opacity: 0.5}});
   };
 
   onTouchEnd = () => {
+    console.log('[AgendaTouch] onTouchEnd');
     this.knob?.current?.setNativeProps({style: {opacity: 1}});
 
     if (this.headerState === 'touched') {
@@ -288,6 +311,7 @@ export default class Agenda extends Component<AgendaProps, State> {
   };
 
   onStartDrag = () => {
+    console.log('[AgendaTouch] onStartDrag');
     this.headerState = 'dragged';
     this.knobTracker.reset();
   };
@@ -296,6 +320,9 @@ export default class Agenda extends Component<AgendaProps, State> {
     // on Android onTouchEnd is not called if dragging was started
     this.onTouchEnd();
     const currentY = e.nativeEvent.contentOffset.y;
+
+    console.log('[AgendaTouch] onSnapAfterDrag: ', currentY);
+
     this.knobTracker.add(currentY);
     const projectedY = currentY + this.knobTracker.estimateSpeed() * 250; /*ms*/
     const maxY = this.initialScrollPadPosition();
@@ -398,20 +425,31 @@ export default class Agenda extends Component<AgendaProps, State> {
   };
 
   renderWeekNumbersSpace = () => {
+    // 即使showWeekNumbers为true, 渲染的也是一个空View，所以renderWeekNumbersSpace()函数和showWeekNumbers都属于废弃代码吧
     return this.props.showWeekNumbers && <View style={this.style.dayHeader}/>;
   };
 
   render() {
     const {hideKnob, style, testID} = this.props;
+    // agendaHeight等于root view height - header height(104)
     const agendaHeight = this.initialScrollPadPosition();
+
+    // 下面通过state.scrollY.interpolate定义了4个从scroll pad动画值映射出来的插值
     const weekdaysStyle = [
       this.style.weekdays,
       {
+        // 这里是通过scroll pad的state.scrollY动画值插值出weekdays view的opacity的值
+        // 完全收缩时，state.scrollY等于agendaHeight，这时opacity为1, 即weekdays view完全不透明
+        // 展开时，当state.scrollY大于agendaHeight - HEADER_HEIGHT, weekdays view慢慢开始出现，这时opacity从0开始慢慢变为1
+        // 这里的extrapolate是'clamp', 确保输出值不会超出定义的范围。
         opacity: this.state.scrollY.interpolate({
           inputRange: [agendaHeight - HEADER_HEIGHT, agendaHeight],
           outputRange: [0, 1],
           extrapolate: 'clamp'
         }),
+        // 这里是通过scroll pad的state.scrollY动画值插值出weekdays view的translateY的值
+        // 完全展开时，state.scrollY等于0，这时translateY为agendaHeight - HEADER_HEIGHT, 即weekdays view完全隐藏
+        // 完全收缩时，state.scrollY等于agendaHeight，这时translateY为0, 即weekdays view完全显示
         transform: [
           {
             translateY: this.state.scrollY.interpolate({
@@ -423,20 +461,31 @@ export default class Agenda extends Component<AgendaProps, State> {
         ]
       }
     ];
+
+    // 这里是通过scroll pad的state.scrollY动画值插值出(calendar view父容器 + knob view)父容器的translateY的值
+    // 完全展开时，state.scrollY等于0，这时translateY为agendaHeight, 即这个父容器bottom距离root view底部为0
+    // 完全收缩时，state.scrollY等于agendaHeight，这时translateY为0, 即这个父容器bottom距离root view底部为agendaHeight
     const headerTranslate = this.state.scrollY.interpolate({
       inputRange: [0, agendaHeight],
       outputRange: [agendaHeight, 0],
       extrapolate: 'clamp'
     });
+
+    // 这里是通过scroll pad的state.scrollY动画值插值出calendar view父容器的translateY的值
+    // 完全展开时，state.scrollY等于0，这时translateY也为0，确保当前日期在垂直居中位置
+    // 完全收缩时，state.scrollY等于agendaHeight，这时translateY为agendaHeight/2，相当于在这个过程中translateY始终为scrollY的1/2，即当前日期始终垂直居中
     const contentTranslate = this.state.scrollY.interpolate({
       inputRange: [0, agendaHeight],
       outputRange: [0, agendaHeight / 2],
       extrapolate: 'clamp'
     });
+
     const headerStyle = [
       this.style.header,
       {
         bottom: agendaHeight,
+        // bottom设置为agendaHeight，即header view的底部距离屏幕底部是agendaHeight，
+        // 然后通过translateY动画，translateY为0时，就是完全收缩状态，translateY为agendaHeight时，就是完全展开状态
         transform: [{translateY: headerTranslate}]
       }
     ];
@@ -450,8 +499,11 @@ export default class Agenda extends Component<AgendaProps, State> {
 
     const openCalendarScrollPadPosition =
       !hideKnob && this.state.calendarScrollable && this.props.showClosingKnob ? agendaHeight + HEADER_HEIGHT : 0;
+
     const shouldAllowDragging = !hideKnob && !this.state.calendarScrollable;
+
     const scrollPadPosition = (shouldAllowDragging ? HEADER_HEIGHT : openCalendarScrollPadPosition) - KNOB_HEIGHT;
+
     const scrollPadStyle = {
       height: KNOB_HEIGHT,
       top: scrollPadPosition,
@@ -460,16 +512,21 @@ export default class Agenda extends Component<AgendaProps, State> {
     return (
       <View testID={testID} onLayout={this.onLayout} style={[style, this.style.container]}>
         <View style={this.style.reservations}>{this.renderReservations()}</View>
+        {/* 这个view的height是就是view height*/}
         <Animated.View style={headerStyle}>
           <Animated.View style={[this.style.animatedContainer, {transform: [{translateY: contentTranslate}]}]}>
             {this.renderCalendarList()}
           </Animated.View>
+          {/* 这个渲染的元素的高度默认是24 */}
           {this.renderKnob()}
         </Animated.View>
+        {/* 这个渲染的元素的高度默认是39.6 */}
         <Animated.View style={weekdaysStyle}>
+          {/* renderWeekNumbersSpace()属于废弃代码 */}
           {this.renderWeekNumbersSpace()}
           {this.renderWeekDaysNames()}
         </Animated.View>
+        {/* 这个scrollView的height就是knob view的height，默认是24，由scrollPadStyle中的height定义 */}
         <Animated.ScrollView
           ref={this.scrollPad}
           style={[this.style.scrollPadStyle, scrollPadStyle]}
@@ -482,10 +539,12 @@ export default class Agenda extends Component<AgendaProps, State> {
           onTouchEnd={this.onTouchEnd}
           onScrollBeginDrag={this.onStartDrag}
           onScrollEndDrag={this.onSnapAfterDrag}
+          // 将滚动状态contentOffset映射到动画值state.scrollY
           onScroll={Animated.event([{nativeEvent: {contentOffset: {y: this.state.scrollY}}}], {useNativeDriver: true})}
         >
           <View
             testID={AGENDA_CALENDAR_KNOB}
+            // 这里的height相当于root view height - 80
             style={{height: agendaHeight + KNOB_HEIGHT}}
             onLayout={this.onScrollPadLayout}
           />
