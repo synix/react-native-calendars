@@ -54,6 +54,8 @@ export type AgendaProps = CalendarListProps & ReservationListProps & {
   hideKnob?: boolean;
   /** Whether the knob should always be visible (when hideKnob = false) */
   showClosingKnob?: boolean;
+  /** 是否在calendar展开时是否显示顶部的weeknames, Default = false */
+  showWeekNamesWhenCalendarExpanded?: boolean;
 }
 
 type State = {
@@ -437,6 +439,7 @@ export default class Agenda extends Component<AgendaProps, State> {
     // 下面通过state.scrollY.interpolate定义了4个从scroll pad动画值映射出来的插值
     const weekdaysStyle = [
       this.style.weekdays,
+      this.props.showWeekNamesWhenCalendarExpanded ? undefined :
       {
         // 这里是通过scroll pad的state.scrollY动画值插值出weekdays view的opacity的值
         // 完全收缩时，state.scrollY等于agendaHeight，这时opacity为1, 即weekdays view完全不透明

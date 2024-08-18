@@ -262,10 +262,12 @@ const CalendarHeader = forwardRef((props: CalendarHeaderProps, ref) => {
 
   const renderDayNames = () => {
     if (!hideDayNames) {
+      // daynames的默认高度值为27, marginTop为7(见src/calendar/header/style.ts中的week)
       return (
         <View
           style={dayNamesStyle}
           testID={`${testID}.dayNames`}
+          onLayout={(e) => { console.log('[CalendarHeader] 03', e.nativeEvent.layout.height) }}
         >
           {renderWeekNumbersSpace()}
           {renderWeekDays}
@@ -275,6 +277,7 @@ const CalendarHeader = forwardRef((props: CalendarHeaderProps, ref) => {
   };
 
   return (
+    // header的默认高度值为81.1
     <View
       testID={testID}
       style={propsStyle}
@@ -285,14 +288,18 @@ const CalendarHeader = forwardRef((props: CalendarHeaderProps, ref) => {
       accessibilityElementsHidden={accessibilityElementsHidden} // iOS
       importantForAccessibility={importantForAccessibility} // Android
     >
+      {/* 默认高度为41.5, marginTop为6 */}
       <View style={headerStyle}>
         {_renderArrow('left')}
+        {/* 默认高度为41.5 */}
         <View style={style.current.headerContainer}>
+          {/* 默认高度为21.5, magrginTop和marginBottom为10 */}
           {_renderHeader()}
           {renderIndicator()}
         </View>
         {_renderArrow('right')}
       </View>
+      {/* daynames的默认高度值为26.9, marginTop为7 */}
       {renderDayNames()}
     </View>
   );

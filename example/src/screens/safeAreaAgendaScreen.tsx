@@ -43,11 +43,12 @@ export default class SafeAreaAgendaScreen extends Component<State> {
           }}
           hideKnob={false}
           showClosingKnob={true}
-          // hideExtraDays={true}
-          // hideDayNames={true}
+          hideExtraDays={true}
+          hideDayNames={true}
           calendarStyle={{backgroundColor: '#D3D2FF'}}
-          // calendarHeight={300}
-          calendarHeaderHeight={69}
+          calendarHeight={314}
+          calendarHeaderHeight={35}
+          showWeekNamesWhenCalendarExpanded={true}
           onCalendarToggled={toggled => {
             console.log('⚡️ onCalendarToggled: ', toggled);
           }}
