@@ -32,6 +32,7 @@ export interface CalendarListProps extends CalendarProps, Omit<FlatListProps<any
   calendarWidth?: number;
   /** Dynamic calendar height */
   calendarHeight?: number;
+  calendarHeaderHeight?: number;
   /** Style for the List item (the calendar) */
   calendarStyle?: ViewStyle;
   /** Whether to use static header that will not scroll with the list (horizontal only) */

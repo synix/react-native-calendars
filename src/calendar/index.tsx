@@ -283,7 +283,7 @@ const Calendar = (props: CalendarProps & ContextProp) => {
   const gestureProps = enableSwipeMonths ? swipeProps : undefined;
 
   return (
-    // 默认情况下高度为360, CalendarHeader高度为81.5，Month高度为278.5，有6行week，所以每行week高度为46.4？
+    // 默认情况下高度为360, CalendarHeader高度为81，Month高度为279，有6行week，所以每行week高度为46.5？
     <GestureComponent {...gestureProps}>
       <View
         style={[style.current.container, propsStyle]}

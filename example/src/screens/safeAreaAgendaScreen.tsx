@@ -28,14 +28,14 @@ export default class SafeAreaAgendaScreen extends Component<State> {
             return <View/>;
           }
           }
-          // renderHeader={(date?: XDate) => {
-          //   return (
-          //     <View style={styles.headerContainer}>
-          //       <Text style={styles.headerMonth}>{date?.toString('MMMM')}</Text>
-          //       <Text style={styles.headerYear}>{date?.toString('yyyy')}</Text>
-          //     </View>
-          //   );
-          // }}
+          renderHeader={(date?: XDate) => {
+            return (
+              <View style={styles.headerContainer}>
+                <Text style={styles.headerMonth}>{date?.toString('MMMM')}</Text>
+                <Text style={styles.headerYear}>{date?.toString('yyyy')}</Text>
+              </View>
+            );
+          }}
           renderKnob={() => {
             return (
               <View style={styles.knob} />
@@ -47,6 +47,7 @@ export default class SafeAreaAgendaScreen extends Component<State> {
           // hideDayNames={true}
           calendarStyle={{backgroundColor: '#D3D2FF'}}
           // calendarHeight={300}
+          calendarHeaderHeight={69}
           onCalendarToggled={toggled => {
             console.log('⚡️ onCalendarToggled: ', toggled);
           }}

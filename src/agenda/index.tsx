@@ -178,12 +178,12 @@ export default class Agenda extends Component<AgendaProps, State> {
 
   calendarOffset() {
     // 为什么是96?
-    // 默认情况下81.5是calendar每个月顶部CalendarHeader的高度(monthname + weekname)
+    // 默认情况下81是calendar每个月顶部CalendarHeader的高度(monthname + weekname)
     // 但是为了使week行上半部的day文字垂直居中，还得加上day高度(默认为32)的一半
-    // 所以这里的准确来说是81.5 + 32 / 2 = 97.5，96只能说是近似值
+    // 所以这里的准确来说是81 + 32 / 2 = 97，96只能说是近似值
 
     // this.viewHeight / 2 表示滚到居中对齐，而不是顶部对齐
-    return 96 - this.viewHeight / 2;
+    return (this.props.calendarHeaderHeight ?? 81) + 32 / 2 - this.viewHeight / 2;
   }
 
   initialScrollPadPosition = () => {
