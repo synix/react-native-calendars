@@ -53,6 +53,7 @@ export interface Theme {
   textMonthFontWeight?: TextStyle['fontWeight'];
   textDayHeaderFontWeight?: TextStyle['fontWeight'];
   textDayFontSize?: number;
+  textDayMarginTop?: number;
   textMonthFontSize?: number;
   textDayHeaderFontSize?: number;
   agendaDayTextColor?: string;

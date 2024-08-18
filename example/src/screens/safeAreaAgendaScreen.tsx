@@ -54,12 +54,12 @@ export default class SafeAreaAgendaScreen extends Component<State> {
           }}
           theme={{
             calendarBackground: '#D3D2FF',
-            // textDayHeaderFontFamily: 'Manrope_500Medium',
-            // textDayHeaderFontWeight: '500',
-            // textDayHeaderFontSize: 12,
+            textDayHeaderFontWeight: '500',
+            textDayHeaderFontSize: 12,
             textSectionTitleColor: '#6C727F',
-            // textDayFontSize: 14,
-            // textDayFontWeight: '700',
+            textDayFontSize: 14,
+            textDayMarginTop: 6,
+            textDayFontWeight: '700',
             textDayStyle: {
               color: '#121826'
             },
@@ -102,11 +102,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   knob: {
-    // width: 38,
-    // height: 4,
-    // marginTop: 10,
-    // borderWidth: 2,
-    // borderColor: '#A8A5FF',
-    // borderRadius: 2
+    width: 38,
+    height: 4,
+    marginTop: 10,
+    borderWidth: 2,
+    borderColor: '#A8A5FF',
+    borderRadius: 2
   }
 });
