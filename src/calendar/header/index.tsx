@@ -267,7 +267,6 @@ const CalendarHeader = forwardRef((props: CalendarHeaderProps, ref) => {
         <View
           style={dayNamesStyle}
           testID={`${testID}.dayNames`}
-          onLayout={(e) => { console.log('[CalendarHeader] 03', e.nativeEvent.layout.height) }}
         >
           {renderWeekNumbersSpace()}
           {renderWeekDays}

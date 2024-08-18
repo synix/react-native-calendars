@@ -54,8 +54,8 @@ export type AgendaProps = CalendarListProps & ReservationListProps & {
   hideKnob?: boolean;
   /** Whether the knob should always be visible (when hideKnob = false) */
   showClosingKnob?: boolean;
-  /** 是否在calendar展开时是否显示顶部的weeknames, Default = false */
-  showWeekNamesWhenCalendarExpanded?: boolean;
+  /** 是否在calendar展开时显示顶部的weeknames, Default = false */
+  showWeekNamesWhenScrollable?: boolean;
 }
 
 type State = {
@@ -65,6 +65,7 @@ type State = {
   firstReservationLoad: boolean;
   selectedDay: XDate;
   topDay: XDate;
+  headerState: string;
 };
 
 /**
@@ -96,7 +97,6 @@ export default class Agenda extends Component<AgendaProps, State> {
   private viewHeight: number;
   private viewWidth: number;
   private scrollTimeout?: ReturnType<typeof setTimeout>;
-  private headerState: string;
   private currentMonth: XDate;
   private knobTracker: VelocityTracker;
   // 用于判断组件是否已挂载, 在componentDidMount中会设置为true, 在componentWillUnmount中会设置为false
@@ -120,7 +120,7 @@ export default class Agenda extends Component<AgendaProps, State> {
     this.viewWidth = windowSize.width;
 
     this.scrollTimeout = undefined;
-    this.headerState = 'idle';
+    this.setState({headerState: 'idle'});
 
     this.state = {
       scrollY: new Animated.Value(0),
@@ -128,7 +128,8 @@ export default class Agenda extends Component<AgendaProps, State> {
       calendarScrollable: false,
       firstReservationLoad: false,
       selectedDay: this.getSelectedDate(props.selected),
-      topDay: this.getSelectedDate(props.selected)
+      topDay: this.getSelectedDate(props.selected),
+      headerState: 'idle',
     };
 
     // 当前月份是通过state.selectedDay来确定的
@@ -136,7 +137,6 @@ export default class Agenda extends Component<AgendaProps, State> {
 
     this.knobTracker = new VelocityTracker();
     this.state.scrollY.addListener(({value}) => {
-      console.log('[Agenda] scrollY: ', value);
       // 完全展开时，scrollY为0，完全收缩时，scrollY为最大值(view height - 104)
       this.knobTracker.add(value);
     });
@@ -290,31 +290,27 @@ export default class Agenda extends Component<AgendaProps, State> {
   onLayout = (event: LayoutChangeEvent) => {
     this.viewHeight = event.nativeEvent.layout.height;
     this.viewWidth = event.nativeEvent.layout.width;
-    console.log('[Agenda] actual viewSize: ', this.viewWidth, this.viewHeight);
     this.forceUpdate();
   };
 
   onTouchStart = () => {
-    console.log('[AgendaTouch] onTouchStart');
-    this.headerState = 'touched';
+    this.setState({headerState: 'touched'});
     this.knob?.current?.setNativeProps({style: {opacity: 0.5}});
   };
 
   onTouchEnd = () => {
-    console.log('[AgendaTouch] onTouchEnd');
     this.knob?.current?.setNativeProps({style: {opacity: 1}});
 
-    if (this.headerState === 'touched') {
+    if (this.state.headerState === 'touched') {
       const isOpen = this.state.calendarScrollable;
       this.toggleCalendarPosition(!isOpen);
     }
 
-    this.headerState = 'idle';
+    this.setState({headerState: 'idle'});
   };
 
   onStartDrag = () => {
-    console.log('[AgendaTouch] onStartDrag');
-    this.headerState = 'dragged';
+    this.setState({headerState: 'dragged'});
     this.knobTracker.reset();
   };
 
@@ -322,8 +318,6 @@ export default class Agenda extends Component<AgendaProps, State> {
     // on Android onTouchEnd is not called if dragging was started
     this.onTouchEnd();
     const currentY = e.nativeEvent.contentOffset.y;
-
-    console.log('[AgendaTouch] onSnapAfterDrag: ', currentY);
 
     this.knobTracker.add(currentY);
     const projectedY = currentY + this.knobTracker.estimateSpeed() * 250; /*ms*/
@@ -383,7 +377,7 @@ export default class Agenda extends Component<AgendaProps, State> {
 
   renderCalendarList() {
     const {markedDates, items} = this.props;
-    const shouldHideExtraDays = this.state.calendarScrollable ? this.props.hideExtraDays : false;
+    const shouldHideExtraDays = this.state.headerState === 'idle' ? (this.state.calendarScrollable ? this.props.hideExtraDays : false) : true;
     const calendarListProps = extractCalendarListProps(this.props);
 
     return (
@@ -439,7 +433,7 @@ export default class Agenda extends Component<AgendaProps, State> {
     // 下面通过state.scrollY.interpolate定义了4个从scroll pad动画值映射出来的插值
     const weekdaysStyle = [
       this.style.weekdays,
-      this.props.showWeekNamesWhenCalendarExpanded ? undefined :
+      this.props.showWeekNamesWhenScrollable ? undefined :
       {
         // 这里是通过scroll pad的state.scrollY动画值插值出weekdays view的opacity的值
         // 完全收缩时，state.scrollY等于agendaHeight，这时opacity为1, 即weekdays view完全不透明

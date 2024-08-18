@@ -48,7 +48,7 @@ export default class SafeAreaAgendaScreen extends Component<State> {
           calendarStyle={{backgroundColor: '#D3D2FF'}}
           calendarHeight={314}
           calendarHeaderHeight={35}
-          showWeekNamesWhenCalendarExpanded={true}
+          showWeekNamesWhenScrollable={true}
           onCalendarToggled={toggled => {
             console.log('⚡️ onCalendarToggled: ', toggled);
           }}
@@ -63,6 +63,7 @@ export default class SafeAreaAgendaScreen extends Component<State> {
             textDayStyle: {
               color: '#121826'
             },
+            textDisabledColor: '#121826'
           }}
         />
       </SafeAreaView>

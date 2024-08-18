@@ -170,7 +170,7 @@ const CalendarList = (props: CalendarListProps & ContextProp, ref: any) => {
     // calendarSize * pastScrollRange, 滚动到initialDate需要多少月
     // diffMonths * calendarSize, 从initialDate滚动到date需要多少月
     // 1. scrollAmount此时只能滚动到整月对齐
-    let scrollAmount = calendarSize * pastScrollRange + diffMonths * calendarSize 
+    let scrollAmount = calendarSize * pastScrollRange + diffMonths * calendarSize;
 
     // 2. 加上要滚动的周数
     // 此时按代码意图滚动是滚动到周对齐，但是因为每个月还有monthname + weekname组成的CalendarHeader，所以想要周对齐，需要加上header的高度
